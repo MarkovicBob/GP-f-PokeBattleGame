@@ -12,6 +12,8 @@ function Game() {
   const [battleRound, setBattleRound] = useState(0);
   const [battleAnimation, setBattleAnimation] = useState(false);
   const [battleWinner, setBattleWinner] = useState(null);
+  const [countdown, setCountdown] = useState(3);
+  const [isCountdownActive, setIsCountdownActive] = useState(false);
 
   const saveGameResult = async (username, score) => {
     try {
@@ -24,6 +26,23 @@ function Game() {
     } catch (error) {
       console.error("Failed to save game result:", error);
     }
+  };
+
+  const startCountdown = () => {
+    setIsCountdownActive(true);
+    let timeLeft = 3;
+    setCountdown(timeLeft);
+
+    const interval = setInterval(() => {
+      timeLeft -= 1;
+      setCountdown(timeLeft);
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        setIsCountdownActive(false);
+        startBattle();
+      }
+    }, 1000);
   };
 
   const startBattle = async () => {
@@ -154,15 +173,6 @@ function Game() {
     }
   };
 
-  const startNewTournament = async () => {
-    setBattleLog([]);
-    setGameOver(false);
-    setWinner(null);
-    setBattleWinner(null);
-
-    await fetchNewTeams();
-  };
-
   if (loading)
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -182,7 +192,7 @@ function Game() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 py-8 px-4">
       <h1 className="text-4xl font-bold text-center text-indigo-800 mb-8 shadow-sm">
-        Pokemon Tournier
+        Pokemon Battle 3x3
       </h1>
 
       {/* Main Screen */}
@@ -223,9 +233,9 @@ function Game() {
               alt="VS"
               className="w-16 h-16 mb-4 animate-bounce"
             />
-            {!gameOver && !isBattling ? (
+            {!isCountdownActive ? (
               <button
-                onClick={startBattle}
+                onClick={startCountdown}
                 disabled={isBattling}
                 className={`w-full py-3 px-6 rounded-full font-bold text-white shadow-lg transform transition-all duration-300 
                   ${
@@ -237,14 +247,9 @@ function Game() {
                 {isBattling ? "The battle is on..." : "Start tournament"}
               </button>
             ) : (
-              !isBattling && (
-                <button
-                  onClick={startNewTournament}
-                  className="w-full py-3 px-6 rounded-full font-bold text-white bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 shadow-lg transform transition-all duration-300 hover:scale-105"
-                >
-                  New Tournier
-                </button>
-              )
+              <div className="text-2xl font-bold text-orange-600">
+                Starting in {countdown}...
+              </div>
             )}
           </div>
 
