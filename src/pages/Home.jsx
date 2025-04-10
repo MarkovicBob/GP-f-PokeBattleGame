@@ -1,54 +1,45 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 
 function Home() {
-  const [pokemons, setPokemons] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const startBattle = (type) => {
+    alert(`Starting a ${type} battle!`);
+    // Ovde možeš dodati logiku za preusmeravanje na battle stranicu
+  };
 
-  useEffect(() => {
-    const fetchPokemons = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(
-          "https://pokeapi.co/api/v2/pokemon?limit=800"
-        );
-        // console.log(res);
-        setPokemons(res.data.results);
-      } catch (error) {
-        console.error("error fetching pokemons:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPokemons();
-  }, []);
-
-  // console.log(pokemons);
   return (
-    <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        pokemons.map((pokemon, index) => {
-          const pokemonId = index + 1;
-          return (
-            <Link
-              key={pokemonId}
-              to={`/pokemon/${pokemonId}`}
-              className="bg-amber-600 p-4 shadow-xl rounded-xl text-center hover:scale-105 transition"
-            >
-              <img
-                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/${pokemonId}.gif
-`}
-                className="w-24 h-24 mx-auto"
-                alt="pokemon image"
-              />
-              <p className="text-lg font-bold">{pokemon.name}</p>
-            </Link>
-          );
-        })
-      )}
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* Hero Section */}
+      <div
+        className="flex flex-col items-center justify-center h-full bg-cover bg-center"
+        style={{
+          backgroundImage: "url('https://example.com/pokemon-hero.jpg')",
+        }}
+      >
+        <h1 className="text-5xl font-bold text-white drop-shadow-md">
+          Pokemon Battle Game
+        </h1>
+        <p className="mt-4 text-xl text-white drop-shadow-sm">
+          Choose your challenge! Battle 1vs1 or team up for 3vs3.
+        </p>
+        <div className="mt-6 space-x-4">
+          <button
+            onClick={() => startBattle("1vs1")}
+            className="px-6 py-3 text-lg font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300"
+          >
+            1vs1 Battle
+          </button>
+          <button
+            onClick={() => startBattle("3vs3")}
+            className="px-6 py-3 text-lg font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          >
+            3vs3 Battle
+          </button>
+        </div>
+      </div>
+      {/* Footer */}
+      <footer className="py-4 text-center bg-gray-800 text-gray-400">
+        &copy; 2025 Pokemon Battle Game. All rights reserved.
+      </footer>
     </div>
   );
 }
