@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import usePokemonTeams from "../hooks/usePokemonTeams.jsx";
+import { toast, Toaster } from "react-hot-toast";
 
 function Game() {
   const { teams, loading, error, fetchNewTeams } = usePokemonTeams();
@@ -14,19 +15,21 @@ function Game() {
   const [battleWinner, setBattleWinner] = useState(null);
   const [countdown, setCountdown] = useState(3);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [isJumping, setIsJumping] = useState(false);
+  const username = localStorage.getItem("username") || "Unknown Player";
 
-  const saveGameResult = async (username, teamAPoints, teamBPoints) => {
+  const saveGameResult = async (name, teamAPoints, teamBPoints) => {
     try {
       let score = teamAPoints * 10;
       if (teamAPoints === 3) {
         score += 10;
       }
-      console.log("Sending data:", { username, score });
+      console.log("Sending data:", { name, score });
 
       await fetch("https://gp-b-pokebattle.onrender.com/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, score }),
+        body: JSON.stringify({ name, score }),
       });
 
       console.log("Game result saved successfully!");
@@ -65,10 +68,24 @@ function Game() {
 
     for (let i = 0; i < 3; i++) {
       setBattleWinner(null);
+      setActivePokemonA(null);
+      setActivePokemonB(null);
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setActivePokemonA(teams.teamA[i]);
       setActivePokemonB(teams.teamB[i]);
       setBattleRound(i + 1);
-      setBattleAnimation(true);
+
+      setIsJumping(true); // начать прыжок
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      setIsJumping(false); // закончить прыжок
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setBattleAnimation(true); // теперь начинается бой
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -96,17 +113,18 @@ function Game() {
 
       if (finalPowerA > finalPowerB) {
         teamAPoints++;
-        roundWinner = "Team A";
-        roundLog = `Round ${i + 1}: Team A wins! ${
+        roundWinner = `Team ${username}`;
+        roundLog = `Round ${i + 1}: Team ${username} wins! ${
           pokemonA.name
         } (power: ${finalPowerA}) defeated ${
           pokemonB.name
         } (power: ${finalPowerB})`;
+
         setBattleWinner("A");
       } else if (finalPowerB > finalPowerA) {
         teamBPoints++;
-        roundWinner = "Team B";
-        roundLog = `Round ${i + 1}: Team B wins! ${
+        roundWinner = "Team Opponent";
+        roundLog = `Round ${i + 1}: Team Opponent wins! ${
           pokemonB.name
         } (power: ${finalPowerB}) defeated ${
           pokemonA.name
@@ -115,14 +133,14 @@ function Game() {
       } else {
         if (pokemonA.stats.speed > pokemonB.stats.speed) {
           teamAPoints++;
-          roundWinner = "Team A";
+          roundWinner = `Team ${username}`;
           roundLog = `Round ${i + 1}: The forces are equal! ${
             pokemonA.name
           } wins thanks to superior speed!`;
           setBattleWinner("A");
         } else if (pokemonB.stats.speed > pokemonA.stats.speed) {
           teamBPoints++;
-          roundWinner = "Team B";
+          roundWinner = "Team Opponent";
           roundLog = `Round ${i + 1}: The forces are equal! ${
             pokemonB.name
           } wins thanks to superior speed!`;
@@ -130,14 +148,14 @@ function Game() {
         } else {
           if (Math.random() > 0.5) {
             teamAPoints++;
-            roundWinner = "Team A";
+            roundWinner = `Team ${username}`;
             roundLog = `Round ${i + 1}: Absolute draw! ${
               pokemonA.name
             } wins by chance!`;
             setBattleWinner("A");
           } else {
             teamBPoints++;
-            roundWinner = "Team B";
+            roundWinner = "Team Opponent";
             roundLog = `Round ${i + 1}: Absolute draw! ${
               pokemonB.name
             } wins by chance!`;
@@ -152,6 +170,11 @@ function Game() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setBattleAnimation(false);
 
+      setTimeout(() => {
+        setActivePokemonA(null);
+        setActivePokemonB(null);
+      }, 300);
+
       if (i < 2) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
@@ -159,11 +182,16 @@ function Game() {
 
     let tournamentWinner;
     if (teamAPoints > teamBPoints) {
-      tournamentWinner = "Team A";
+      tournamentWinner = `Team ${username}`;
+      toast.success("You Won!", {
+        icon: "👏",
+      });
     } else if (teamBPoints > teamAPoints) {
-      tournamentWinner = "Team B";
+      tournamentWinner = "Team Opponent";
+      toast.error("You Lost!");
     } else {
       tournamentWinner = "Draw";
+      toast("It's a Draw!");
     }
 
     setWinner(tournamentWinner);
@@ -173,8 +201,7 @@ function Game() {
     setActivePokemonB(null);
     setBattleRound(0);
 
-    const username = localStorage.getItem("username") || "Unknown Player";
-    if (tournamentWinner === "Team A") {
+    if (tournamentWinner === `Team ${username}`) {
       saveGameResult(username, teamAPoints, teamBPoints);
     }
   };
@@ -196,22 +223,22 @@ function Game() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 py-8 px-4">
-      <h1 className="text-4xl font-bold text-center text-indigo-800 mb-8 shadow-sm">
+    <div className="min-h-screen bg-[#f0fdfa] py-8 px-4">
+      <h1 className="text-4xl font-bold text-center text-[#0f766f] mb-8 shadow-sm">
         Pokemon Battle 3x3
       </h1>
-
+      <Toaster position="top-center" reverseOrder={false} si />
       {/* Main Screen */}
       {!battleAnimation ? (
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-          <div className="team-container w-full md:w-5/12 bg-red-100 rounded-lg p-4 shadow-lg flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-red-700 text-center border-b-2 border-red-300 pb-2 mb-4 w-full">
-              Team A
+          <div className="team-container w-full md:w-5/12 bg-[#96f6e4] rounded-lg p-4 shadow-lg flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-[#0f766f] text-center border-b-2 border-[#0f766f]-300 pb-2 mb-4 w-full">
+              Team {username}
             </h2>
             <div className="grid grid-cols-1 gap-6 w-full">
               {teams.teamA.map((pokemon, index) => (
                 <div
-                  key={pokemon.id}
+                  key={`${pokemon.id}-${battleRound}`}
                   className="pokemon-card flex flex-col items-center justify-center p-4"
                 >
                   <div
@@ -225,7 +252,7 @@ function Game() {
                       className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                     />
                   </div>
-                  <h3 className="mt-2 text-lg font-bold text-red-700 capitalize">
+                  <h3 className="mt-2 text-lg font-bold text-[#0f766f] capitalize">
                     {pokemon.name}
                   </h3>
                 </div>
@@ -243,7 +270,7 @@ function Game() {
               <button
                 onClick={startCountdown}
                 disabled={isBattling}
-                className={`w-full py-3 px-6 rounded-full font-bold text-white shadow-lg transform transition-all duration-300 
+                className={`w-full hover:cursor-pointer py-3 px-6 rounded-full font-bold text-white shadow-lg transform transition-all duration-300 
                   ${
                     isBattling
                       ? "bg-gray-500 cursor-not-allowed"
@@ -259,9 +286,9 @@ function Game() {
             )}
           </div>
 
-          <div className="team-container w-full md:w-5/12 bg-blue-100 rounded-lg p-4 shadow-lg flex flex-col items-center">
-            <h2 className="text-2xl font-bold text-blue-700 text-center border-b-2 border-blue-300 pb-2 mb-4 w-full">
-              Team B
+          <div className="team-container w-full md:w-5/12 bg-[#ccfbf1] rounded-lg p-4 shadow-lg flex flex-col items-center">
+            <h2 className="text-2xl font-bold text-[#0f766f] text-center border-b-2 border-[#0f766f]-300 pb-2 mb-4 w-full">
+              Team Opponent
             </h2>
             <div className="grid grid-cols-1 gap-6 w-full">
               {teams.teamB.map((pokemon, index) => (
@@ -280,7 +307,7 @@ function Game() {
                       className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                     />
                   </div>
-                  <h3 className="mt-2 text-lg font-bold text-blue-700 capitalize">
+                  <h3 className="mt-2 text-lg font-bold text-[#0f766f] capitalize">
                     {pokemon.name}
                   </h3>
                 </div>
@@ -366,7 +393,7 @@ function Game() {
                       </div>
                     )}
                   </div>
-                  <h3 className="mt-2 text-xl font-bold text-blue-700 capitalize">
+                  <h3 className="mt-2 text-xl font-bold text-[#0f766f] capitalize">
                     {activePokemonB.name}
                   </h3>
                   <div className="mt-2 w-full bg-gray-200 rounded-full h-4">
@@ -387,7 +414,7 @@ function Game() {
       {/* Result */}
       {gameOver && !battleAnimation && (
         <div className="battle-results bg-white rounded-lg shadow-xl p-6 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-purple-800 mb-4 border-b-2 border-purple-200 pb-2">
+          <h2 className="text-2xl font-bold text-center text-[#0f766f] mb-4 border-b-2 border-[#0f766f] pb-2">
             Result
           </h2>
 
@@ -397,9 +424,9 @@ function Game() {
                 key={index}
                 className={`py-2 px-3 mb-2 rounded-lg ${
                   log.includes("wins")
-                    ? log.includes("Team A wins")
-                      ? "bg-red-100 text-red-800"
-                      : "bg-blue-100 text-blue-800"
+                    ? log.includes(`Team ${username} wins`)
+                      ? "bg-[#96f6e4] text-[#0f766f]"
+                      : "bg-[#ccfbf1] text-[#0f766f]"
                     : "bg-purple-100 text-purple-800"
                 }`}
               >
@@ -410,10 +437,10 @@ function Game() {
 
           <h3
             className={`text-xl font-bold text-center p-3 rounded-lg ${
-              winner === "Team A"
+              winner === `Team ${username}`
                 ? "bg-red-100 text-red-700"
-                : winner === "Team B"
-                ? "bg-blue-100 text-blue-700"
+                : winner === "Team Opponent"
+                ? "bg-blue-100 text-[#0f766f]"
                 : "bg-purple-100 text-purple-700"
             }`}
           >
