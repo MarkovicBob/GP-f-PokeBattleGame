@@ -21,6 +21,7 @@ function Game() {
       if (teamAPoints === 3) {
         score += 10;
       }
+      console.log("Sending data:", { username, score });
 
       await fetch("https://gp-b-pokebattle.onrender.com/leaderboard", {
         method: "POST",
