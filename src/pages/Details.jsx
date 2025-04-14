@@ -1,11 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { ScaleLoader } from "react-spinners";
 
-function PokemonDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [pokemon, setPokemon] = useState([]);
+function PokemonDetail({ id, onClose }) {
+  const [pokemon, setPokemon] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -14,53 +12,58 @@ function PokemonDetail() {
       try {
         const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
         setPokemon(res.data);
-        // console.log(res);
       } catch (error) {
-        console.error("error fetching single pokemon", error);
+        console.error("Error fetching single Pokémon", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchPokemonDetails();
+    if (id) {
+      fetchPokemonDetails();
+    }
   }, [id]);
+
+  if (loading || !pokemon) {
+    return (
+      <p className="p-6 text-center">
+        <ScaleLoader />
+      </p>
+    );
+  }
+
   return (
     <div className="p-6 text-center flex flex-col">
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
+      <h2 className="text-6xl uppercase pb-10 font-extrabold ">
+        {pokemon.name}
+      </h2>
+      <div className="flex flex-row gap-10 justify-evenly">
         <div>
-          <h2 className="text-3-xl uppercase font-bold">{pokemon.name}</h2>
-          <div>
-            <img
-              src={pokemon.sprites?.other?.showdown?.front_default}
-              alt="pokemonImage"
-              className="w-40 mx-auto"
-            />
-            <p className="text-lg">Weight:{pokemon.weight / 10} kg</p>
-            <p className="text-lg">Height:{pokemon.height / 10} m</p>
-
-            <ul>
-              <p>MOVES: </p>
-              {pokemon?.moves?.slice(0, 6).map((m, index) => (
-                <li key={index}>{m.move.name}</li>
-              ))}
-            </ul>
-            {/* <p>HP: {pokemon.stats[0].base_stat}</p>
-            <p>ATTACK: {pokemon.stats[1].base_stat}</p>
-            <p>DEFENCE: {pokemon.stats[2].base_stat}</p>
-            <p>SPECIAL ATTACK: {pokemon.stats[3].base_stat}</p>
-            <p>SPECIAL DEFENCE: {pokemon.stats[4].base_stat}</p>
-            <p>SPEED: {pokemon.stats[5].base_stat}</p> */}
-
-            <button
-              className="text-blue-500 bg-amber-900 rounded-2xl w-25 cursor-pointer hover:bg-fuchsia-400 "
-              onClick={() => navigate("/")}
-            >
-              BACK
-            </button>
-          </div>
+          <img
+            src={pokemon.sprites?.other?.showdown?.front_default}
+            alt="pokemonImage"
+            className="w-50 mx-auto"
+          />
+          <p className="text-2xl font-bold italic uppercase">
+            Type: {pokemon.types.map((t) => t.type.name).join(", ")}
+          </p>
+          <p className="text-lg">Weight: {pokemon.weight / 10} kg</p>
+          <p className="text-lg">Height: {pokemon.height / 10} m</p>
         </div>
-      )}
+        <div>
+          <p className="font-bold italic">MOVES:</p>
+          <ul className="list-disc text-left pl-6">
+            {pokemon.moves.slice(0, 12).map((m, index) => (
+              <li key={index}>{m.move.name}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <button
+        className="mt-6 text-black bg-yellow-100 rounded-2xl px-4 py-2 cursor-pointer hover:bg-yellow-200"
+        onClick={onClose}
+      >
+        CLOSE
+      </button>
     </div>
   );
 }
