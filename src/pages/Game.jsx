@@ -15,13 +15,19 @@ function Game() {
   const [countdown, setCountdown] = useState(3);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
 
-  const saveGameResult = async (username, score) => {
+  const saveGameResult = async (username, teamAPoints, teamBPoints) => {
     try {
-      await fetch("/api/leaderboard", {
+      let score = teamAPoints * 10;
+      if (teamAPoints === 3) {
+        score += 10;
+      }
+
+      await fetch("https://gp-b-pokebattle.onrender.com/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, score }),
       });
+
       console.log("Game result saved successfully!");
     } catch (error) {
       console.error("Failed to save game result:", error);
@@ -167,9 +173,8 @@ function Game() {
     setBattleRound(0);
 
     const username = localStorage.getItem("username") || "Unknown Player";
-    const score = tournamentWinner === "Team A" ? teamAPoints : 0;
-    if (tournamentWinner !== "Draw") {
-      saveGameResult(username, score);
+    if (tournamentWinner === "Team A") {
+      saveGameResult(username, teamAPoints, teamBPoints);
     }
   };
 
