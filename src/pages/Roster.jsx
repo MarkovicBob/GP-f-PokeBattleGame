@@ -6,7 +6,7 @@ import { MdOutlineStar } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 
-function Roster() {
+function Roster({ user }) {
   const [pokemons, setPokemons] = useState([]);
   const [loading, setLoading] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -16,6 +16,7 @@ function Roster() {
   const navigate = useNavigate();
   const [setPokemon] = useState([]);
 
+  console.log({ user });
   const handleClick = (pokemonId) => {
     setFavorites((prevFavorites) => {
       if (prevFavorites.includes(pokemonId)) {
