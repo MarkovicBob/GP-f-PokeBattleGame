@@ -11,20 +11,17 @@ function App() {
   const [user, setUser] = useState("");
 
   useEffect(() => {
-    // const user1 = localStorage.getItem("User");
-    // setUser(user1);
-    const user = JSON.parse(localStorage.getItem("User"));
-    console.log(user);
-    setUser(user);
+    const userName = localStorage.getItem("User");
+
+    setUser(userName);
   }, []);
   return (
     <>
       <Routes>
         <Route path="/" element={<MainLayout user={user} />}>
-          <Route index element={<Home />} />
-          <Route path="/roster" element={<Roster user={user} />} />
+          <Route index element={<Home setUser={setUser} />} />
+          <Route path="/roster" element={<Roster />} />
           <Route path="/game" element={<Game />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
 
           {/* NOT FOUND  */}
           <Route path="*" element={<NotFound />} />

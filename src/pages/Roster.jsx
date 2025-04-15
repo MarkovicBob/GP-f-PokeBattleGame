@@ -13,18 +13,41 @@ function Roster({ user }) {
   const [favoritesDetails, setFavoritesDetails] = useState([]);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const [setPokemon] = useState([]);
 
-  console.log({ user });
+  // const handleClick = (pokemonId) => {
+
+  //   setFavorites((prevFavorites) => {
+  //     let updatedFavorites;
+  //     if (prevFavorites.includes(pokemonId)) {
+  //       return prevFavorites.filter((id) => id !== pokemonId);
+  //     } else if (prevFavorites.length < 3) {
+  //       return [...prevFavorites, pokemonId];
+  //     }
+  //     return prevFavorites;
+  //   });
+  //   localStorage.setItem("selectedPokemons", JSON.stringify(updatedFavorites));
+  //   return updatedFavorites
+  // };
+
   const handleClick = (pokemonId) => {
     setFavorites((prevFavorites) => {
+      let updatedFavorites;
       if (prevFavorites.includes(pokemonId)) {
-        return prevFavorites.filter((id) => id !== pokemonId);
+        updatedFavorites = prevFavorites.filter((id) => id !== pokemonId);
       } else if (prevFavorites.length < 3) {
-        return [...prevFavorites, pokemonId];
+        updatedFavorites = [...prevFavorites, pokemonId];
+      } else {
+        updatedFavorites = prevFavorites;
       }
-      return prevFavorites;
+
+      localStorage.setItem(
+        "selectedPokemons",
+        JSON.stringify(updatedFavorites)
+      );
+      return updatedFavorites;
     });
   };
 
@@ -119,7 +142,7 @@ function Roster({ user }) {
           {Array.from({ length: 3 }).map((_, index) => (
             <span
               key={index}
-              className="bg-[#ffff00] max-w-max h-max p-4 shadow-xl rounded-xl text-center hover:scale-105 transition"
+              className="bg-[#ffff00] max-w-max h-max p-4 shadow-xl rounded-xl text-center hover:scale-105 transition text-black"
             >
               {favoritesDetails[index] ? (
                 <div className="flex flex-row items-center">
@@ -175,7 +198,7 @@ function Roster({ user }) {
                   </div>
                 </div>
               ) : (
-                "Missing Pokemon"
+                "Choose Pokemon from below"
               )}
             </span>
           ))}
@@ -216,7 +239,7 @@ function Roster({ user }) {
             return (
               <div
                 key={pokemonId}
-                className="bg-amber-600 p-4 shadow-xl rounded-xl text-center hover:scale-105 transition"
+                className="bg-amber-400 p-4 shadow-xl rounded-xl text-center hover:scale-105 transition"
                 onClick={() => openModal(pokemonId)}
               >
                 <p className="text-xl font-bold uppercase">{pokemon.name}</p>

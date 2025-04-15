@@ -12,10 +12,8 @@ const usePokemonTeams = () => {
     try {
       setLoading(true);
 
-      const storedTeamA = JSON.parse(
-        localStorage.getItem("selectedPokemons") || "[]"
-      );
-
+      const storedTeamA = localStorage.getItem("selectedPokemons") || "[]";
+      console.log(storedTeamA);
       if (storedTeamA.length === 3) {
         setTeams((prevTeams) => ({
           ...prevTeams,

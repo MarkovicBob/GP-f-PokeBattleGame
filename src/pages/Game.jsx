@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import usePokemonTeams from "../hooks/usePokemonTeams.jsx";
 import { toast, Toaster } from "react-hot-toast";
+import backgroundImage from "../assets/backgroundOpacity.jpg";
 
 function Game() {
   const { teams, loading, error, fetchNewTeams } = usePokemonTeams();
@@ -16,7 +17,8 @@ function Game() {
   const [countdown, setCountdown] = useState(3);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
 
-  const username = localStorage.getItem("username") || "Unknown Player";
+  const username = localStorage.getItem("User") || "Unknown Player";
+  console.log(username);
 
   const saveGameResult = async (name, teamAPoints, teamBPoints) => {
     try {
@@ -219,15 +221,26 @@ function Game() {
     );
 
   return (
-    <div className="min-h-screen bg-[#f0fdfa] py-8 px-4">
-      <h1 className="text-4xl font-bold text-center text-[#0f766f] mb-8 shadow-sm">
+    <div
+      className="min-h-screen bg-[#f0fdfa] py-8 px-4 bg-center bg-cover"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+      }}
+    >
+      <h1
+        className="text-6xl font-bold text-center mb-8 shadow-sm   text-[#ffff00]"
+        style={{
+          textShadow:
+            "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
+        }}
+      >
         Pokemon Battle 3x3
       </h1>
       <Toaster position="top-center" reverseOrder={false} si />
       {/* Main Screen */}
       {!battleAnimation ? (
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-          <div className="team-container w-full md:w-5/12 bg-[#96f6e4] rounded-lg p-4 shadow-lg flex flex-col items-center">
+          <div className="team-container bg-amber-200 w-full md:w-5/12  rounded-lg p-4 shadow-lg flex flex-col items-center">
             <h2 className="text-2xl font-bold text-[#0f766f] text-center border-b-2 border-[#0f766f]-300 pb-2 mb-4 w-full">
               Team {username}
             </h2>
