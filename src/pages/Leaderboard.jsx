@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function Leaderboard() {
+function Leaderboard({ setIsLeaderBoard }) {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -28,9 +28,9 @@ function Leaderboard() {
   const sortedList = [...list].sort((a, b) => b.score - a.score);
 
   return (
-    <div>
+    <div className=" p-6 max-w-4xl mx-auto">
       <h1
-        className="text-6xl font-bold text-center mb-8 shadow-sm   text-[#ffff00]"
+        className="text-6xl font-bold text-center mb-8 text-[#ffff00]"
         style={{
           textShadow:
             "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
@@ -38,13 +38,21 @@ function Leaderboard() {
       >
         Leaderboard
       </h1>
-      <div className="d-flex mx-auto justify-center">
+      <div
+        onClick={() => {
+          setIsLeaderBoard(false);
+        }}
+        className="hover:cursor-pointer bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 transition duration-300 text-center w-24 mx-auto"
+      >
+        Х
+      </div>
+      <div className="flex mx-auto justify-center p-6">
         <ul>
-          {sortedList.map((item) => {
+          {sortedList.slice(0, 10).map((item, index) => {
             return (
-              <li key={item.id}>
-                <span>{item.id}</span>
-                <span>{item.name}</span>
+              <li key={item.id} className="text-2xl">
+                <span className="mr-4">{index + 1}</span>
+                <span className="mr-4">{item.name}</span>
                 <span>{item.score}</span>
               </li>
             );

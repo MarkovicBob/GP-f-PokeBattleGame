@@ -74,7 +74,7 @@ function Navbar({ user }) {
           </li>
         </ul>
       </nav>
-      {isLeaderBoard && <Leaderboard />}
+      {isLeaderBoard && <Leaderboard setIsLeaderBoard={setIsLeaderBoard} />}
     </>
   );
 }

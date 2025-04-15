@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import usePokemonTeams from "../hooks/usePokemonTeams.jsx";
 import { toast, Toaster } from "react-hot-toast";
 import backgroundImage from "../assets/backgroundOpacity.jpg";
+import axios from "axios";
 
 function Game() {
   const { teams, loading, error, fetchNewTeams } = usePokemonTeams();
@@ -16,9 +17,36 @@ function Game() {
   const [battleWinner, setBattleWinner] = useState(null);
   const [countdown, setCountdown] = useState(3);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [selectedPokemons, setSelectedPokemons] = useState([]);
 
   const username = localStorage.getItem("User") || "Unknown Player";
   console.log(username);
+
+  useEffect(() => {
+    const storedPokemons = localStorage.getItem("selectedPokemons");
+    if (storedPokemons) {
+      const pokemonIds = JSON.parse(storedPokemons);
+
+      // Загружаем данные о покемонах
+      const fetchPokemonDetails = async () => {
+        try {
+          const details = await Promise.all(
+            pokemonIds.map(async (id) => {
+              const res = await axios.get(
+                `https://pokeapi.co/api/v2/pokemon/${id}`
+              );
+              return res.data;
+            })
+          );
+          setSelectedPokemons(details);
+        } catch (error) {
+          console.error("Error fetching selected Pokémon details:", error);
+        }
+      };
+
+      fetchPokemonDetails();
+    }
+  }, []);
 
   const saveGameResult = async (name, teamAPoints, teamBPoints) => {
     try {
@@ -129,32 +157,34 @@ function Game() {
         } (power: ${finalPowerA})`;
         setBattleWinner("B");
       } else {
-        if (pokemonA.stats.speed > pokemonB.stats.speed) {
+        // Если силы равны, проверяем скорость
+        if (pokemonA.stats[5].base_stat > pokemonB.stats[5].base_stat) {
           teamAPoints++;
           roundWinner = `Team ${username}`;
-          roundLog = `Round ${i + 1}: The forces are equal! ${
+          roundLog = `Round ${i + 1}: Team ${username}'s ${
             pokemonA.name
           } wins thanks to superior speed!`;
           setBattleWinner("A");
-        } else if (pokemonB.stats.speed > pokemonA.stats.speed) {
+        } else if (pokemonB.stats[5].base_stat > pokemonA.stats[5].base_stat) {
           teamBPoints++;
           roundWinner = "Team Opponent";
-          roundLog = `Round ${i + 1}: The forces are equal! ${
+          roundLog = `Round ${i + 1}: Team Opponent's ${
             pokemonB.name
           } wins thanks to superior speed!`;
           setBattleWinner("B");
         } else {
+          // Если силы и скорость равны, выбираем случайного победителя
           if (Math.random() > 0.5) {
             teamAPoints++;
             roundWinner = `Team ${username}`;
-            roundLog = `Round ${i + 1}: Absolute draw! ${
+            roundLog = `Round ${i + 1}: Absolute draw! Team ${username}'s ${
               pokemonA.name
             } wins by chance!`;
             setBattleWinner("A");
           } else {
             teamBPoints++;
             roundWinner = "Team Opponent";
-            roundLog = `Round ${i + 1}: Absolute draw! ${
+            roundLog = `Round ${i + 1}: Absolute draw! Team Opponent's ${
               pokemonB.name
             } wins by chance!`;
             setBattleWinner("B");
@@ -256,9 +286,9 @@ function Game() {
                     }`}
                   >
                     <img
-                      src={pokemon.officialArt}
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`}
+                      className="w-24 h-24 mx-auto"
                       alt={pokemon.name}
-                      className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                     />
                   </div>
                   <h3 className="mt-2 text-lg font-bold text-[#0f766f] capitalize">
@@ -311,7 +341,7 @@ function Game() {
                     }`}
                   >
                     <img
-                      src={pokemon.officialArt}
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`}
                       alt={pokemon.name}
                       className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
                     />
@@ -331,20 +361,12 @@ function Game() {
           </h2>
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div
-              className={`pokemon-fighter w-full md:w-5/12 flex flex-col items-center ${
-                battleWinner === "A"
-                  ? "scale-110"
-                  : battleWinner === "B"
-                  ? "opacity-60"
-                  : ""
-              } transition-all duration-500`}
-            >
+            <div className="pokemon-fighter w-full md:w-5/12 flex flex-col items-center">
               {activePokemonA && (
                 <>
                   <div className="w-40 h-40 md:w-52 md:h-52 relative">
                     <img
-                      src={activePokemonA.officialArt}
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${activePokemonA.id}.png`}
                       alt={activePokemonA.name}
                       className={`w-full h-full object-contain ${
                         battleAnimation ? "animate-pulse" : ""
@@ -363,7 +385,9 @@ function Game() {
                     <div
                       className="bg-red-600 h-4 rounded-full"
                       style={{
-                        width: `${(activePokemonA.stats.hp / 255) * 100}%`,
+                        width: `${
+                          (activePokemonA.stats[0].base_stat / 255) * 100
+                        }%`,
                       }}
                     ></div>
                   </div>
@@ -377,20 +401,12 @@ function Game() {
               </div>
             </div>
 
-            <div
-              className={`pokemon-fighter w-full md:w-5/12 flex flex-col items-center ${
-                battleWinner === "B"
-                  ? "scale-110"
-                  : battleWinner === "A"
-                  ? "opacity-60"
-                  : ""
-              } transition-all duration-500`}
-            >
+            <div className="pokemon-fighter w-full md:w-5/12 flex flex-col items-center">
               {activePokemonB && (
                 <>
                   <div className="w-40 h-40 md:w-52 md:h-52 relative">
                     <img
-                      src={activePokemonB.officialArt}
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${activePokemonB.id}.png`}
                       alt={activePokemonB.name}
                       className={`w-full h-full object-contain ${
                         battleAnimation ? "animate-pulse" : ""
@@ -409,7 +425,9 @@ function Game() {
                     <div
                       className="bg-blue-600 h-4 rounded-full"
                       style={{
-                        width: `${(activePokemonB.stats.hp / 255) * 100}%`,
+                        width: `${
+                          (activePokemonB.stats[0].base_stat / 255) * 100
+                        }%`,
                       }}
                     ></div>
                   </div>
@@ -432,10 +450,10 @@ function Game() {
               <p
                 key={index}
                 className={`py-2 px-3 mb-2 rounded-lg ${
-                  log.includes("wins")
-                    ? log.includes(`Team ${username} wins`)
-                      ? "bg-[#96f6e4] text-[#0f766f]"
-                      : "bg-[#ccfbf1] text-[#0f766f]"
+                  log.includes(`Team ${username}`) && log.includes("wins")
+                    ? "bg-amber-200 text-[#0f766f]"
+                    : log.includes("Team Opponent") && log.includes("wins")
+                    ? "bg-[#ccfbf1] text-[#0f766f]"
                     : "bg-purple-100 text-purple-800"
                 }`}
               >
