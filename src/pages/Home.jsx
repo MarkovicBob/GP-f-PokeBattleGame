@@ -3,7 +3,7 @@ import backgroundImage from "../assets/background.jpg";
 import pokeBall from "../assets/pokeball4.gif";
 import { useNavigate } from "react-router-dom";
 
-function Home() {
+function Home({ setUser }) {
   const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [isValid, setIsValid] = useState(false);
@@ -12,6 +12,7 @@ function Home() {
     e.preventDefault();
     localStorage.setItem("User", input);
     setInput("");
+    setUser(input);
     navigate("/roster");
   };
 
