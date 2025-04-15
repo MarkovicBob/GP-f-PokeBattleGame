@@ -15,7 +15,7 @@ function Game() {
   const [battleWinner, setBattleWinner] = useState(null);
   const [countdown, setCountdown] = useState(3);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
-  const [isJumping, setIsJumping] = useState(false);
+
   const username = localStorage.getItem("username") || "Unknown Player";
 
   const saveGameResult = async (name, teamAPoints, teamBPoints) => {
@@ -77,15 +77,11 @@ function Game() {
       setActivePokemonB(teams.teamB[i]);
       setBattleRound(i + 1);
 
-      setIsJumping(true); // начать прыжок
-
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setIsJumping(false); // закончить прыжок
 
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      setBattleAnimation(true); // теперь начинается бой
+      setBattleAnimation(true);
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
