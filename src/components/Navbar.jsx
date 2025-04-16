@@ -67,8 +67,8 @@ function Navbar({ user }) {
             <NavLink to=" ">
               <img
                 className="w-40"
-                src="/src/assets/poke-logo.png"
-                alt="./poke-logo"
+                src="./src/assets/poke-logo.png"
+                alt="poke-logo"
               />
             </NavLink>
           </li>
