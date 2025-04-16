@@ -198,22 +198,13 @@ function Roster({ user }) {
                   </div>
                 </div>
               ) : (
-                "Choose Pokemon from below"
+                `Choose Pokemon from below`
               )}
             </span>
           ))}
         </div>
 
         <div className="flex justify-center flex-col gap-2">
-          <p className="text-center text-black italic font-semibold">
-            {favorites.length === 0
-              ? "Please select 3 Pokémons from roster below"
-              : favorites.length === 1
-              ? "Please select 2 Pokémons from roster below"
-              : favorites.length === 2
-              ? "Please select 1 Pokémon from roster below"
-              : "Ready for battle!"}
-          </p>
           <button
             onClick={handleBattle}
             className={`px-6 py-3 text-lg font-semibold text-white ${
@@ -222,9 +213,7 @@ function Roster({ user }) {
                 : "bg-red-400"
             } rounded-lg focus:outline-none focus:ring-4 cursor-pointer`}
           >
-            Take it to the
-            <br />
-            battleground
+            Go to battleground
           </button>
         </div>
       </div>

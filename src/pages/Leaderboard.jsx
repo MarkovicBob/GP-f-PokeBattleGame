@@ -42,7 +42,7 @@ function Leaderboard({ setIsLeaderBoard }) {
         onClick={() => {
           setIsLeaderBoard(false);
         }}
-        className="hover:cursor-pointer bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 transition duration-300 text-center w-24 mx-auto"
+        className="hover:cursor-pointer absolute right-[40px] top-[100px] bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:bg-red-600 transition duration-300 text-center w-24 mx-auto"
       >
         Х
       </div>
