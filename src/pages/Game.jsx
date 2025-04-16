@@ -20,12 +20,14 @@ function Game() {
   const [selectedPokemons, setSelectedPokemons] = useState([]);
 
   const username = localStorage.getItem("User") || "Unknown Player";
+  console.log(username);
 
   useEffect(() => {
     const storedPokemons = localStorage.getItem("selectedPokemons");
     if (storedPokemons) {
       const pokemonIds = JSON.parse(storedPokemons);
 
+      // Загружаем данные о покемонах
       const fetchPokemonDetails = async () => {
         try {
           const details = await Promise.all(
@@ -155,6 +157,7 @@ function Game() {
         } (power: ${finalPowerA})`;
         setBattleWinner("B");
       } else {
+        // Если силы равны, проверяем скорость
         if (pokemonA.stats[5].base_stat > pokemonB.stats[5].base_stat) {
           teamAPoints++;
           roundWinner = `Team ${username}`;
@@ -170,6 +173,7 @@ function Game() {
           } wins thanks to superior speed!`;
           setBattleWinner("B");
         } else {
+          // Если силы и скорость равны, выбираем случайного победителя
           if (Math.random() > 0.5) {
             teamAPoints++;
             roundWinner = `Team ${username}`;
@@ -461,9 +465,9 @@ function Game() {
           <h3
             className={`text-xl font-bold text-center p-3 rounded-lg ${
               winner === `Team ${username}`
-                ? "bg-amber-200 text-[#0f766f]"
+                ? "bg-red-100 text-red-700"
                 : winner === "Team Opponent"
-                ? "bg-[#ccfbf1] text-[#0f766f]"
+                ? "bg-blue-100 text-[#0f766f]"
                 : "bg-purple-100 text-purple-700"
             }`}
           >

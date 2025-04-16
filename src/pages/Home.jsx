@@ -36,7 +36,7 @@ function Home({ setUser }) {
           }}
         >
           <p
-            className="text-2xl text-center font-bold text-[#ffff00] bg-[#ffffffb3] rounded p-4 "
+            className="text-2xl text-center font-bold text-[#ffff00]"
             style={{
               textShadow:
                 "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
@@ -53,8 +53,8 @@ function Home({ setUser }) {
               }}
               type="text"
               name="user"
-              placeholder="Enter your name here"
-              className="py-4 px-2 bg-white text-black mt-4 text-center rounded"
+              placeholder="Your name"
+              className="py-4 px-2 bg-white text-black"
             />
 
             <button type="submit" className={`${isValid ? "block" : "hidden"}`}>

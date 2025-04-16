@@ -1,6 +1,7 @@
+import Leaderboard from "../pages/Leaderboard";
+import pokelogo from "../assets/poke-logo.png";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import Leaderboard from "../pages/Leaderboard";
 
 function Navbar({ user }) {
   const [isNotice, setisNotice] = useState(false);
@@ -65,11 +66,7 @@ function Navbar({ user }) {
             }}
           >
             <NavLink to=" ">
-              <img
-                className="w-40"
-                src="./src/assets/poke-logo.png"
-                alt="poke-logo"
-              />
+              <img src={pokelogo} className="w-40" alt="poke-logo" />
             </NavLink>
           </li>
         </ul>
