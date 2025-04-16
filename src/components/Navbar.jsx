@@ -66,10 +66,7 @@ function Navbar({ user }) {
             }}
           >
             <NavLink to=" ">
-              <div
-                style={{ pokelogo: `url(${pokelogo})` }}
-                className="logo w-40"
-              ></div>
+              <img src={pokelogo} className="w-40" alt="poke-logo" />
             </NavLink>
           </li>
         </ul>
