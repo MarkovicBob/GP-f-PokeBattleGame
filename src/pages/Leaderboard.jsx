@@ -14,7 +14,7 @@ function Leaderboard({ setIsLeaderBoard }) {
         );
 
         const leaderBoardList = res.data.data;
-        console.log(leaderBoardList);
+
         setList(leaderBoardList);
       } catch (error) {
         console.error("Error fetching Leaderboard", error);
